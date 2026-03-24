@@ -320,7 +320,7 @@ setuptools<81
 - `sites.json`, `proxies.txt` ve `data/` git'e dahil edilmez (hassas bilgi)
 - Çoklu VFS hesabı desteklenir — `accounts` listesine ekle
 - Dashboard için Flask ve flask-socketio kurulumu gerekir: `pip install flask flask-socketio`
-- IMAP için Gmail hesabında "App Password" oluşturulması gerekir (2FA aktif)
+- VFS'den gelen OTP kodları Gmail IMAP üzerinden otomatik okunur; 2FA bildirimleri Telegram üzerinden iletilir
 
 ---
 
