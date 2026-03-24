@@ -1,0 +1,8 @@
+python-telegram-bot==22.1
+playwright==1.53.0
+python-dotenv==1.0.1
+python-telegram-bot
+playwright
+python-dotenv
+playwright-stealth
+setuptools<81

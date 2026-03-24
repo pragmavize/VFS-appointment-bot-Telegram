@@ -1,0 +1,14 @@
+[Unit]
+Description=Visa Onefile Watcher V5
+After=network.target
+
+[Service]
+Type=simple
+User=rootuser
+WorkingDirectory=/home/rootuser/visabotreal
+ExecStart=/home/rootuser/visabotreal/venv/bin/python /home/rootuser/visabotreal/visa_watch_onefile.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,31 @@
+# Hassas konfigürasyon (hesap bilgileri, proxy listesi)
+sites.json
+proxies.txt
+.env
+
+# Çalışma verisi
+data/
+*.log
+watchdog.log
+dashboard.log
+
+# Debug ekran görüntüleri
+hata_ekrani_*.png
+
+# HAR dosyaları (debug)
+*.har
+
+# Yedek ve geçici dosyalar
+*.zip
+*.pid
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# Sistem
+.DS_Store
