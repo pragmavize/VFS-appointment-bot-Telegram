@@ -23,6 +23,9 @@ hata_ekrani_*.png
 *.zip
 *.pid
 
+# GOST binary (büyük dosya, elle indirilmeli)
+gost
+
 # Python
 __pycache__/
 *.py[cod]

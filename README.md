@@ -141,6 +141,51 @@ visabotreal/
 
 ---
 
+## SOCKS5 Proxy — GOST Köprüsü
+
+Firefox/Camoufox, kimlik doğrulamalı (`user:pass`) SOCKS5 proxy'leri doğrudan desteklemez.
+Bu nedenle bot, **GOST** aracılığıyla yerel bir kimliksiz tünel açar:
+
+```
+proxies.txt'deki auth-SOCKS5
+        │
+        ▼
+  GOST (yerel port, ör. 127.0.0.1:14501)   ← kimliksiz
+        │
+        ▼
+  Camoufox / Playwright
+```
+
+### GOST Kurulumu
+
+```bash
+# En son sürümü indir (Linux amd64)
+wget https://github.com/go-gost/gost/releases/latest/download/gost_linux_amd64.tar.gz
+tar -xzf gost_linux_amd64.tar.gz
+mv gost /home/rootuser/visabotreal/gost
+chmod +x /home/rootuser/visabotreal/gost
+```
+
+> GOST binary proje dizininde (`./gost`) olmalıdır. Binary hassas veri içermez, git'e eklenebilir ya da `.gitignore`'da tutulabilir.
+
+### proxies.txt SOCKS5 Formatı
+
+```
+# HTTP proxy (auth doğrudan desteklenir)
+ip:port:user:pass:http
+
+# SOCKS5 proxy (GOST köprüsü otomatik açılır)
+ip:port:user:pass:socks5
+
+# Kimliksiz SOCKS5
+ip:port:::socks5
+```
+
+Bot başlarken GOST binary yoksa uyarı verir ve sadece HTTP proxy ile çalışmaya devam eder.
+`start_all.sh` da GOST varlığını kontrol eder ve eski tünel süreçlerini temizler.
+
+---
+
 ## Kurulum
 
 ### 1. Bağımlılıkları Yükle
