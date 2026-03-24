@@ -23,7 +23,7 @@ hata_ekrani_*.png
 *.zip
 *.pid
 
-# GOST binary (büyük dosya, elle indirilmeli)
+# GOST binary (büyük dosya, elle indirilmeli — Docker image içinde gelir)
 gost
 
 # Python

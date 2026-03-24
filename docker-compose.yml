@@ -1,0 +1,28 @@
+services:
+  visabot:
+    image: ghcr.io/kaven0667/visarealbot:latest
+    container_name: visabot
+    restart: unless-stopped
+    volumes:
+      - ./sites.json:/app/sites.json:ro
+      - ./proxies.txt:/app/proxies.txt:ro
+      - ./.env:/app/.env:ro
+      - ./data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  dashboard:
+    image: ghcr.io/kaven0667/visarealbot:latest
+    container_name: visabot-dashboard
+    restart: unless-stopped
+    command: python3 dashboard.py
+    ports:
+      - "8585:8585"
+    volumes:
+      - ./sites.json:/app/sites.json:ro
+      - ./proxies.txt:/app/proxies.txt:ro
+      - ./data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - visabot

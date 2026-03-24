@@ -141,6 +141,51 @@ visabotreal/
 
 ---
 
+## Docker ile Kurulum (Alternatif)
+
+Docker kullanmak isteyenler için hazır image GitHub Container Registry'de yayınlanır.
+
+### Hızlı Başlangıç
+
+```bash
+# 1. Konfigürasyon dosyalarını oluştur
+cp sites.json.example sites.json   # düzenle
+cp proxies.txt.example proxies.txt # düzenle
+echo "TELEGRAM_BOT_TOKEN=your_token" > .env
+
+# 2. Bot + Dashboard'u başlat
+docker compose up -d
+
+# 3. Logları takip et
+docker logs -f visabot
+```
+
+### Sadece Bot
+
+```bash
+docker run -d \
+  --name visabot \
+  --restart unless-stopped \
+  -v $(pwd)/sites.json:/app/sites.json:ro \
+  -v $(pwd)/proxies.txt:/app/proxies.txt:ro \
+  -v $(pwd)/.env:/app/.env:ro \
+  -v $(pwd)/data:/app/data \
+  ghcr.io/kaven0667/visarealbot:latest
+```
+
+### Volume Yapısı
+
+| Host | Container | Açıklama |
+|------|-----------|----------|
+| `./sites.json` | `/app/sites.json` | Site & hesap konfigürasyonu |
+| `./proxies.txt` | `/app/proxies.txt` | Proxy listesi |
+| `./.env` | `/app/.env` | Telegram token |
+| `./data/` | `/app/data/` | State, veritabanı, cookie'ler |
+
+> GOST binary image içinde gelir — SOCKS5 proxy'ler Docker kurulumunda da çalışır.
+
+---
+
 ## SOCKS5 Proxy — GOST Köprüsü
 
 Firefox/Camoufox, kimlik doğrulamalı (`user:pass`) SOCKS5 proxy'leri doğrudan desteklemez.
