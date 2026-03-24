@@ -11,8 +11,8 @@ RUN pip install --no-cache-dir -r requirements.txt camoufox
 RUN python -m camoufox fetch
 
 # GOST binary (SOCKS5 proxy köprüsü)
-RUN wget -q https://github.com/go-gost/gost/releases/download/v3.0.0-rc10/gost_3.0.0-rc10_linux_amd64.tar.gz \
-    -O /tmp/gost.tar.gz \
+RUN curl -fsSL https://github.com/go-gost/gost/releases/download/v3.0.0-rc10/gost_3.0.0-rc10_linux_amd64.tar.gz \
+    -o /tmp/gost.tar.gz \
     && tar -xzf /tmp/gost.tar.gz -C /tmp \
     && mv /tmp/gost /app/gost \
     && chmod +x /app/gost \
