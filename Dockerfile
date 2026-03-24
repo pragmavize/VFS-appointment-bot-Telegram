@@ -5,9 +5,9 @@ WORKDIR /app
 
 # Python bağımlılıkları
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt camoufox
 
-# Camoufox (Firefox)
+# Camoufox (Firefox binary)
 RUN python -m camoufox fetch
 
 # GOST binary (SOCKS5 proxy köprüsü)
