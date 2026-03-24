@@ -369,6 +369,12 @@ setuptools<81
 
 ---
 
+## İletişim
+
+Sorular ve destek için Telegram: [@kaven667](https://t.me/kaven667)
+
+---
+
 ## Lisans
 
 Özel kullanım. İzinsiz dağıtım ve paylaşım yasaktır.
