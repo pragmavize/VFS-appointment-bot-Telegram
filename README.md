@@ -1,18 +1,114 @@
-# VFS Visa Bot 🤖
+# VISABot — Otomatik Vize Randevu Botu
 
-Telegram üzerinden çalışan, VFS Global ve diğer vize randevu sistemleri için otomatik slot takip ve rezervasyon botu.
+Telegram üzerinden çalışan, **VFS Global**, **AS-Visa** ve **BLS** sistemleri için otomatik slot takip ve randevu alma botu. Türkiye'deki vize başvuru ajansları için geliştirilmiştir.
 
 ---
 
-## Özellikler
+## Desteklenen Servisler
 
-- **VFS Global** — Camoufox (Firefox tabanlı, Cloudflare Turnstile bypass) + hesap rotasyonu + proxy rotasyonu
-- **AS-Visa / BLS** — Playwright Chromium + stealth modu
-- **OTP otomasyonu** — Gmail IMAP üzerinden otomatik OTP okuma
-- **Müşteri yönetimi** — SQLite tabanlı müşteri veritabanı (`/musteriler` komutu)
-- **Akıllı optimizasyon** — Proxy/hesap başarı oranı takibi, otomatik cooldown
-- **Systemd entegrasyonu** — Otomatik başlangıç ve çökme sonrası yeniden başlatma
-- **Dashboard** — Anlık durum izleme
+### VFS Global (Camoufox + Hesap Rotasyonu)
+
+| Ülke | Site Key |
+|------|----------|
+| Fransa 🇫🇷 | `vfs_fr` |
+| Hollanda 🇳🇱 | `vfs_nl` |
+| Danimarka 🇩🇰 | `vfs_dk` |
+| İsveç 🇸🇪 | `vfs_se` |
+| Avusturya 🇦🇹 | `vfs_at` |
+| Belçika 🇧🇪 | `vfs_be` |
+| Çek Cumhuriyeti 🇨🇿 | `vfs_cz` |
+| Estonya 🇪🇪 | `vfs_ee` |
+| Finlandiya 🇫🇮 | `vfs_fi` |
+| İsviçre 🇨🇭 | `vfs_ch` |
+| İzlanda 🇮🇸 | `vfs_is` |
+| Letonya 🇱🇻 | `vfs_lv` |
+| Litvanya 🇱🇹 | `vfs_lt` |
+| Lüksemburg 🇱🇺 | `vfs_lu` |
+| Malta 🇲🇹 | `vfs_mt` |
+| Norveç 🇳🇴 | `vfs_no` |
+| Polonya 🇵🇱 | `vfs_pl` |
+
+### AS-Visa (Playwright Stealth)
+
+| Şehir | Site Key |
+|-------|----------|
+| Macaristan – İstanbul 🇭🇺 | `hu_asvisa_istanbul` |
+| Macaristan – Ankara 🇭🇺 | `hu_asvisa_ankara` |
+
+### BLS (Playwright Stealth)
+
+| Ülke | Site Key |
+|------|----------|
+| İspanya 🇪🇸 | `es_bls` |
+
+---
+
+## Telegram Komutları
+
+| Komut | Açıklama |
+|-------|----------|
+| `/start` | Ana menüyü açar |
+| `/menu` | Ana menüyü açar (alias) |
+| `/check` | Ana menüyü açar (alias) |
+| `/musteriler` | Müşteri yönetim paneli |
+| `/istatistik` | Son 24 saatin başarı istatistikleri |
+| `/takip` | Aktif takip oturumları |
+| `/restart` | Botu yeniden başlatır |
+| Metin yaz | Müşteri adı/pasaport ile otomatik arama |
+
+---
+
+## Bot Menü Akışı
+
+```
+/start
+└── 🌍 Ülke Seç (country grubu)
+    └── 📅 Randevu Al
+        ├── Mevcut Başvuru Seç
+        └── ➕ Yeni Başvuru Başlat
+            ├── Merkez Seç
+            ├── Kategori / Alt Kategori Seç
+            ├── Tarih & Saat Seç
+            └── ✅ Randevu Oluştur / 🔄 Başka Merkez
+
+/musteriler
+├── ➕ Yeni Müşteri Ekle       (adım adım wizard)
+├── 📋 Tüm Müşteriler
+├── ⏳ Bekleyenler
+├── ✅ Randevu Alınanlar
+├── 🤖 Otomatik Takipler       (aktif oturumlar, durdur)
+└── 📊 İstatistik
+
+Müşteri Detay
+├── 📅 Randevu Al
+├── 🤖 Otomatik Takip Başlat / Durdur
+├── ✏️ Durum Güncelle
+└── 🗑️ Sil
+```
+
+---
+
+## Dashboard
+
+Web tabanlı izleme paneli — **http://localhost:8585**
+
+### Özellikler
+
+- **Bot durumu** — Çalışıyor / Durdu, uptime
+- **İstatistik kartları** — Başarılı (24s), Başarı oranı, Toplam deneme, Aktif proxy
+- **Saatlik grafik** — Son 7 günün başarı trendi
+- **Son denemeler** — Proxy, hesap, süre, sonuç
+- **Müşteri özeti** — Bekleyen / tamamlanan / toplam
+- **Son hatalar** — Hata mesajı + zaman
+- **Proxy yönetimi** — Aktif/pasif toggle, rotation URL düzenleme
+- **Canlı log** — WebSocket ile anlık log akışı
+
+### Çalıştırma
+
+```bash
+python dashboard.py
+# → http://0.0.0.0:8585
+```
 
 ---
 
@@ -20,32 +116,34 @@ Telegram üzerinden çalışan, VFS Global ve diğer vize randevu sistemleri iç
 
 ```
 visabotreal/
-├── visa_watch_onefile.py   # Ana bot (1300+ satır)
-├── customer_db.py          # Müşteri veritabanı modülü
-├── optimizer.py            # Proxy/hesap optimizasyon motoru
-├── dashboard.py            # Durum dashboard'u
-├── watchdog.py             # Bot sağlık izleyici
-├── auto_booking.py         # Otomatik rezervasyon yardımcısı
-├── sites.json              # Site konfigürasyonu (gitignore'da)
-├── proxies.txt             # Proxy listesi (gitignore'da)
+├── visa_watch_onefile.py   # Ana bot — 1300+ satır
+│                           # VFS/AS-Visa/BLS akışları, Telegram handler'lar
+├── customer_db.py          # SQLite müşteri modülü
+│                           # customers.db — ad, pasaport, durum, ülke
+├── optimizer.py            # Akıllı proxy/hesap optimizasyon motoru
+│                           # attempt_log, account_cooldown tabloları
+├── dashboard.py            # Flask + SocketIO web dashboard (port 8585)
+├── watchdog.py             # Bot sağlık izleyici, çökünce yeniden başlatır
+├── auto_booking.py         # Otomatik randevu yardımcı modülü
+│
+├── sites.json              # Site konfigürasyonu [GİTİGNORE]
+├── proxies.txt             # Proxy listesi [GİTİGNORE]
 ├── requirements.txt        # Python bağımlılıkları
 ├── visa-onefile.service    # Systemd service dosyası
-├── start_all.sh            # Toplu başlatma scripti
-└── data/                   # Durum dosyaları (gitignore'da)
-    ├── state.json
-    ├── customers.db
-    └── cookies/
+├── start_all.sh            # Bot + dashboard toplu başlatma
+│
+└── data/                   # Çalışma verisi [GİTİGNORE]
+    ├── state.json          # Aktif takip durumları
+    ├── customers.db        # Müşteri veritabanı
+    ├── cookies/            # VFS oturum cookie'leri
+    └── proxy_rotation.json # Proxy başarı istatistikleri
 ```
 
 ---
 
 ## Kurulum
 
-### 1. Gereksinimler
-
-- Python 3.10+
-- Playwright
-- Camoufox
+### 1. Bağımlılıkları Yükle
 
 ```bash
 pip install -r requirements.txt
@@ -55,85 +153,102 @@ python -m camoufox fetch
 
 ### 2. Konfigürasyon
 
-**`sites.json`** dosyasını oluştur (şablonu kopyala):
+**`sites.json`** — her site için:
 
-```bash
-cp sites.json.example sites.json
+```json
+[
+  {
+    "key": "vfs_fr",
+    "group_key": "france",
+    "menu_label": "France 🇫🇷",
+    "url": "https://visa.vfsglobal.com/tur/en/fra/login",
+    "telegram_chat_id": "YOUR_CHAT_ID",
+    "accounts": [
+      {
+        "email": "your@gmail.com",
+        "password": "your_password",
+        "imap_app_password": "your_imap_app_password"
+      }
+    ],
+    "vfs_options": {
+      "center": "Istanbul",
+      "category": "Schengen Visa"
+    }
+  }
+]
 ```
 
-Her site için gerekli alanlar:
-- `key` — site tanımlayıcısı
-- `url` — hedef URL
-- `accounts` — VFS hesap listesi (email, şifre, IMAP app password)
-- `telegram_chat_id` — bildirim alacak Telegram chat ID
-
-**`proxies.txt`** dosyasına proxy ekle:
+**`proxies.txt`** — her satıra bir proxy:
 ```
 http://user:pass@host:port
 socks5://host:port
+host:port:user:pass:http
 ```
 
-**`.env`** dosyası (Telegram bot token):
+**`.env`** — Telegram token:
 ```
 TELEGRAM_BOT_TOKEN=your_token_here
 ```
 
-### 3. Systemd ile Çalıştırma
+### 3. Systemd ile Çalıştırma (Önerilen)
 
 ```bash
 sudo cp visa-onefile.service /etc/systemd/system/visabot.service
+# Servis dosyasında WorkingDirectory ve ExecStart yollarını güncelle
 sudo systemctl daemon-reload
 sudo systemctl enable visabot.service
 sudo systemctl start visabot.service
 ```
 
-Log takibi:
+Durum ve log:
 ```bash
+sudo systemctl status visabot.service
 tail -f /home/rootuser/visabotreal/bot.log
 ```
 
 ### 4. Manuel Çalıştırma
 
 ```bash
+# Sadece bot
 python visa_watch_onefile.py
+
+# Bot + Dashboard birlikte
+bash start_all.sh
 ```
-
----
-
-## Telegram Komutları
-
-| Komut | Açıklama |
-|-------|----------|
-| `/start` | Ana menü |
-| `/musteriler` | Müşteri paneli (ekle, listele, ara) |
-| `/istatistik` | Son 24 saatin başarı istatistikleri |
-| Metin yaz | Otomatik müşteri arama |
 
 ---
 
 ## Mimari
 
 ```
-Telegram Bot API
-      │
-      ▼
-visa_watch_onefile.py
-      │
-      ├── VFS Global → Camoufox (Firefox, CF bypass)
-      │                    └── OTP → Gmail IMAP
-      │
-      ├── AS-Visa / BLS → Playwright Chromium (stealth)
-      │
-      ├── customer_db.py → SQLite (customers.db)
-      │
-      └── optimizer.py → attempt_log, account_cooldown tabloları
+Kullanıcı (Telegram)
+        │
+        ▼
+visa_watch_onefile.py  ──────────────────────────────────────────┐
+        │                                                         │
+        ├─── VFS Global ──► Camoufox (Firefox)                   │
+        │                       ├── CF Turnstile bypass          │
+        │                       ├── Hesap rotasyonu              │
+        │                       ├── Proxy rotasyonu              │
+        │                       └── OTP ──► Gmail IMAP           │
+        │                                                         │
+        ├─── AS-Visa ─────► Playwright Chromium (stealth)        │
+        ├─── BLS ──────────► Playwright Chromium (stealth)       │
+        │                                                         │
+        ├─── customer_db.py ──► SQLite (customers.db)            │
+        └─── optimizer.py ───► attempt_log / account_cooldown    │
+                                                                  │
+dashboard.py  ◄───────────────────────────────────────────────────┘
+(Flask + SocketIO, port 8585)
 ```
 
-### Hesap & Proxy Rotasyonu
+### Hesap & Proxy Rotasyon Mantığı
 
-- Rate limit → bir sonraki hesaba geç, 5 dk cooldown
+- Rate limit → sonraki hesaba geç, **5 dakika cooldown**
 - 5xx sunucu hatası → hesap rotasyonu
-- Proxy pool → başarı oranına göre sıralanır
+- Session expire → cookie dosyası silinir, yeniden login
+- VFS'de kayıtlı olmayan email → "VFS'de kayıtlı değil" hatası
+- Proxy pool → başarı oranına göre dinamik sıralama
 
 ---
 
@@ -149,14 +264,21 @@ setuptools<81
 
 ---
 
+## Screenshots
+
+> Bot ve dashboard ekran görüntüleri için `screenshots/` klasörüne bakın.
+
+---
+
 ## Notlar
 
-- `sites.json`, `proxies.txt` ve `data/` klasörü hassas bilgi içerdiğinden git'e dahil edilmez
-- Çoklu VFS hesabı desteklenir (hesap rotasyonu için `accounts` listesi)
-- Session expire olduğunda cookie otomatik temizlenir ve yeniden login yapılır
+- `sites.json`, `proxies.txt` ve `data/` git'e dahil edilmez (hassas bilgi)
+- Çoklu VFS hesabı desteklenir — `accounts` listesine ekle
+- Dashboard için Flask ve flask-socketio kurulumu gerekir: `pip install flask flask-socketio`
+- IMAP için Gmail hesabında "App Password" oluşturulması gerekir (2FA aktif)
 
 ---
 
 ## Lisans
 
-Özel kullanım. İzinsiz dağıtım yasaktır.
+Özel kullanım. İzinsiz dağıtım ve paylaşım yasaktır.

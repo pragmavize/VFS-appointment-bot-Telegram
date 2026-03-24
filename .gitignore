@@ -12,6 +12,10 @@ dashboard.log
 # Debug ekran görüntüleri
 hata_ekrani_*.png
 
+# Screenshots klasörü içeriğini takip et (klasörü koru)
+!screenshots/
+!screenshots/.gitkeep
+
 # HAR dosyaları (debug)
 *.har
 
