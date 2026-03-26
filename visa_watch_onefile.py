@@ -149,16 +149,8 @@ ADMIN_CHAT_ID: int = int(os.getenv("ADMIN_CHAT_ID", "5816716319"))
 _bot_ref: list = [None]  # [bot_instance]
 
 async def send_admin_photo(path: str, caption: str = "") -> None:
-    """Ekran görüntüsünü sadece admin'e gönderir (müşteriye değil)."""
-    bot = _bot_ref[0]
-    if not bot:
-        logger.warning(f"Admin photo: bot ref yok, sadece log: {path}")
-        return
-    try:
-        with open(path, "rb") as f:
-            await bot.send_photo(chat_id=ADMIN_CHAT_ID, photo=f, caption=caption[:1000])
-    except Exception as e:
-        logger.warning(f"Admin photo send hatası: {e}")
+    """Ekran görüntüsünü sadece loglar (Telegram'a gönderilmez)."""
+    logger.info(f"Admin photo (gönderilmedi): {path}")
 
 logging.basicConfig(
     level=getattr(logging, LOG_LEVEL, logging.INFO),
@@ -1319,6 +1311,25 @@ async def fetch_site(site: dict[str, Any], proxies: list[dict], dynamic_config: 
                 'input[placeholder*="verification" i]',
             ]
 
+            # OTP beklemeden önce dashboard'da olup olmadığımızı kontrol et.
+            # VFS bazen OTP atlar ve direkt dashboard'a gider; eğer öyleyse 30 saniyelik
+            # beklemeyi atlıyoruz — bu sürede Angular arka planda API çağrıları yapıp
+            # page-not-found'a yönlenebiliyor ve bot yanlışlıkla session expired sanıyor.
+            if not _skip_login_remaining:
+                _pre_otp_url = page.url
+                _pre_otp_body = ""
+                try:
+                    _pre_otp_body = (await page.locator("body").inner_text())[:600]
+                except Exception:
+                    pass
+                _dashboard_indicators_pre = ["sign out", "dashboard", "start new booking", "active application",
+                                             "book appointment", "my applications", "no appointment"]
+                if any(x in _pre_otp_body.lower() for x in _dashboard_indicators_pre) or (
+                    "dashboard" in _pre_otp_url.lower() and "login" not in _pre_otp_url.lower()
+                ):
+                    logger.info(f"OTP bekleme atlanıyor — giriş öncesi dashboard tespit edildi. URL: {_pre_otp_url}")
+                    _skip_login_remaining = True
+
             otp_selector = None if _skip_login_remaining else await wait_first_visible(page, otp_selectors, timeout_ms=30000)
             if not otp_selector and not _skip_login_remaining:
                 # OTP gelmemiş olabilir — VFS bazen OTP atlar ve direkt dashboard'a gider
@@ -2054,17 +2065,67 @@ async def fetch_site(site: dict[str, Any], proxies: list[dict], dynamic_config: 
                         logger.debug(f"_yd_fill: {e}")
                     return False
 
+                def _yd_css(text: str) -> str:
+                    """Placeholder metnini içeren input için CSS selector üretir."""
+                    safe = text.replace('"', '')
+                    return f'input[placeholder*="{safe}" i], textarea[placeholder*="{safe}" i]'
+
                 async def _yd_has(placeholder: str) -> bool:
-                    """Sayfada bu placeholder'a sahip görünür bir input var mı?"""
+                    """Sayfada bu placeholder veya label'a sahip görünür bir input var mı?"""
                     try:
-                        return await page.get_by_placeholder(placeholder, exact=False).first.is_visible(timeout=2000)
+                        if await page.locator(_yd_css(placeholder)).first.is_visible(timeout=3000):
+                            return True
                     except Exception:
-                        return False
+                        pass
+                    try:
+                        if await page.get_by_label(placeholder, exact=False).first.is_visible(timeout=1000):
+                            return True
+                    except Exception:
+                        pass
+                    # JS fallback: Angular overlay sebebiyle Playwright is_visible False dönebilir
+                    try:
+                        ph_lower = placeholder.lower()
+                        found = await page.evaluate(
+                            """(ph) => Array.from(document.querySelectorAll("input, textarea"))
+                               .some(el => el.offsetHeight > 0 && (el.placeholder || "").toLowerCase().includes(ph))""",
+                            ph_lower
+                        )
+                        if found:
+                            return True
+                    except Exception:
+                        pass
+                    return False
 
                 async def _yd_write(placeholder: str, value: str, label: str) -> bool:
-                    """Placeholder ile input'u bulup değer yazar."""
-                    loc = page.get_by_placeholder(placeholder, exact=False).first
+                    """CSS selector veya label ile input'u bulup değer yazar."""
+                    loc = page.locator(_yd_css(placeholder)).first
                     ok = await _yd_fill(loc, value)
+                    if not ok:
+                        loc2 = page.get_by_label(placeholder, exact=False).first
+                        ok = await _yd_fill(loc2, value)
+                    if not ok:
+                        # JS fallback: Angular overlay varsa doğrudan DOM üzerinden doldur
+                        try:
+                            ph_lower = placeholder.lower()
+                            ok = await page.evaluate(
+                                """([ph, val]) => {
+                                    const el = Array.from(document.querySelectorAll("input, textarea"))
+                                        .find(e => e.offsetHeight > 0 && (e.placeholder || "").toLowerCase().includes(ph));
+                                    if (!el) return false;
+                                    el.focus();
+                                    const nativeInput = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value');
+                                    if (nativeInput) nativeInput.set.call(el, val);
+                                    else el.value = val;
+                                    el.dispatchEvent(new Event('input', {bubbles: true}));
+                                    el.dispatchEvent(new Event('change', {bubbles: true}));
+                                    return true;
+                                }""",
+                                [ph_lower, str(value)]
+                            )
+                            if ok:
+                                logger.info(f"Dolduruldu JS ile ({label}): {value}")
+                        except Exception as _jfe:
+                            logger.debug(f"_yd_write JS fallback: {_jfe}")
                     if ok:
                         logger.info(f"Dolduruldu ({label}): {value}")
                     else:
@@ -2089,6 +2150,18 @@ async def fetch_site(site: dict[str, Any], proxies: list[dict], dynamic_config: 
                     if await _yd_has("ENTER YOUR FIRST NAME") or await _yd_has("FIRST NAME") or await _yd_has("First Name"):
                         _form_ready = True
                         break
+                    # JS ile direkt DOM kontrolü (Playwright is_visible bazen Angular overlay'den False döner)
+                    try:
+                        _js_ready = await page.evaluate(
+                            """() => Array.from(document.querySelectorAll("input"))
+                               .some(el => el.offsetHeight > 0 && (el.placeholder || "").toLowerCase().includes("first"))"""
+                        )
+                        if _js_ready:
+                            _form_ready = True
+                            logger.info("Form JS ile hazır tespit edildi")
+                            break
+                    except Exception:
+                        pass
                     _fr_body = (await page.locator("body").inner_text())[:300].lower()
                     if "session expired" in _fr_body or "401" in page.url:
                         logger.warning("Kişisel bilgiler formu beklenirken session sona erdi")
@@ -2101,6 +2174,18 @@ async def fetch_site(site: dict[str, Any], proxies: list[dict], dynamic_config: 
                     logger.warning("Kişisel bilgiler formu 60s içinde yüklenmedi — 5s daha bekleniyor")
                     await _sleep(5)
                 await save_error_screenshot("your_details_form_baslangic")
+
+                # DOM debug: sayfadaki tüm input'ların placeholder/formcontrolname değerlerini logla
+                try:
+                    _inp_dbg = await page.evaluate("""() =>
+                        Array.from(document.querySelectorAll("input, textarea")).map(el => ({
+                            ph: el.placeholder, fcn: el.getAttribute("formcontrolname"),
+                            type: el.type, name: el.name, visible: el.offsetHeight > 0
+                        }))
+                    """)
+                    logger.info(f"DOM input debug: {_inp_dbg}")
+                except Exception as _de:
+                    logger.debug(f"DOM debug err: {_de}")
 
                 # Sayfadaki alanları dinamik olarak tespit et
                 _has_firstname    = await _yd_has("ENTER YOUR FIRST NAME") or await _yd_has("First Name")
@@ -2117,69 +2202,104 @@ async def fetch_site(site: dict[str, Any], proxies: list[dict], dynamic_config: 
                     _has_nationality = await page.locator('mat-select[formcontrolname="nationality"], mat-select[formcontrolname="nationalityId"]').first.is_visible(timeout=1000)
                 except Exception:
                     pass
-                _has_phone        = await _yd_has("012345648382") or await _yd_has("Phone Number") or await _yd_has("Contact Number")
+                _has_phone        = await _yd_has("Contact number") or await _yd_has("Phone Number") or await _yd_has("Contact Number") or await _yd_has("012345648382")
                 _has_passport_exp = await _yd_has("Expiry") or await _yd_has("EXPIRY") or await _yd_has("passportExpiryDate")
-                _has_email        = await _yd_has("ENTER EMAIL ADDRESS") or await _yd_has("Email Address")
+                _has_email        = await _yd_has("Email") or await _yd_has("Email Address") or await _yd_has("ENTER EMAIL ADDRESS")
 
                 logger.info(f"YD alanları: firstname={_has_firstname} lastname={_has_lastname} passport={_has_passport} "
                             f"dob={_has_dob} gender={_has_gender} nationality={_has_nationality} "
                             f"phone={_has_phone} passport_exp={_has_passport_exp} email={_has_email}")
 
-                if notify_func:
-                    await notify_func("📝 *Kişisel bilgileri girin:*")
+                # Hiçbir alan bulunamadıysa JS ile DOM'dan placeholder listesi alıp override et
+                if not any([_has_firstname, _has_lastname, _has_passport, _has_phone, _has_email]):
+                    try:
+                        _dom_phs = await page.evaluate(
+                            """() => Array.from(document.querySelectorAll("input, textarea"))
+                               .filter(el => el.offsetHeight > 0)
+                               .map(el => (el.placeholder || "").toLowerCase())"""
+                        )
+                        logger.info(f"JS DOM placeholder listesi: {_dom_phs}")
+                        def _jph(kw): return any(kw in ph for ph in _dom_phs)
+                        if _jph("first"):    _has_firstname = True
+                        if _jph("last"):     _has_lastname  = True
+                        if _jph("passport"): _has_passport  = True
+                        if _jph("birth") or _jph("dd/mm"): _has_dob = True
+                        if _jph("contact") or _jph("phone") or _jph("012345"): _has_phone = True
+                        if _jph("expir"):    _has_passport_exp = True
+                        if _jph("email"):    _has_email = True
+                        logger.info(f"JS override sonrası: firstname={_has_firstname} lastname={_has_lastname} "
+                                    f"passport={_has_passport} dob={_has_dob} phone={_has_phone} email={_has_email}")
+                    except Exception as _jde:
+                        logger.debug(f"JS alan override hatası: {_jde}")
 
-                if not wait_input_func:
+                # Müşteri kaydından otomatik doldur (varsa), yoksa Telegram'dan sor
+                _cust = dynamic_config.get("customer")
+                if _cust:
+                    _cname_parts = (_cust.name or "").strip().split(None, 1)
+                    _cust_first = _cname_parts[0] if _cname_parts else ""
+                    _cust_last  = _cname_parts[1] if len(_cname_parts) > 1 else ""
+                    logger.info(f"Müşteri auto-fill: {_cust.name}, pasaport={_cust.passport_no}, tel={_cust.phone}, email={_cust.email}")
+                    if notify_func:
+                        await notify_func(f"📝 Kişisel bilgiler *{_cust.name}* için otomatik dolduruluyor...")
+                else:
+                    _cust_first = _cust_last = ""
+
+                if not wait_input_func and not _cust:
                     pass
                 else:
                     if _has_firstname:
-                        val = await wait_input_func("👤 *Ad (First Name)* girin:")
+                        val = _cust_first or (await wait_input_func("👤 *Ad (First Name)* girin:") if wait_input_func else "")
                         if val:
-                            await _yd_write("ENTER YOUR FIRST NAME", val, "firstName")
+                            await _yd_write("First Name", val, "firstName")
 
                     if _has_lastname:
-                        val = await wait_input_func("👤 *Soyad (Last Name)* girin:")
+                        val = _cust_last or (await wait_input_func("👤 *Soyad (Last Name)* girin:") if wait_input_func else "")
                         if val:
-                            await _yd_write("PLEASE ENTER LAST NAME", val, "lastName")
+                            await _yd_write("Last Name", val, "lastName")
 
                     if _has_dob:
-                        val = await wait_input_func("📅 *Doğum Tarihi* girin (DD/MM/YYYY — örn: `01/01/1990`):")
+                        val = await wait_input_func("📅 *Doğum Tarihi* girin (DD/MM/YYYY — örn: `01/01/1990`):") if wait_input_func else ""
                         if val:
-                            await _yd_write("DD/MM/YYYY", val, "dateOfBirth")
+                            await _yd_write("Date of Birth", val, "dateOfBirth")
 
                     if _has_gender:
                         gender_btns = [[
                             InlineKeyboardButton("👨 Erkek (Male)",   callback_data="vfs_pick:Male"),
                             InlineKeyboardButton("👩 Kadın (Female)", callback_data="vfs_pick:Female"),
                         ]]
-                        val = await wait_input_func("⚧ *Cinsiyet (Gender) seçin:*", gender_btns)
+                        val = (await wait_input_func("⚧ *Cinsiyet (Gender) seçin:*", gender_btns)) if wait_input_func else ""
                         if val:
                             await select_mat_option('mat-select[formcontrolname="gender"]', val, "Cinsiyet")
 
                     if _has_nationality:
-                        _mc = (site.get("mission_code") or "").upper()
-                        _NATL_MAP = {
-                            "DNK": ("🇩🇰 Danimarkalı", "Danish"),
-                            "FRA": ("🇫🇷 Fransız",     "French"),
-                            "NLD": ("🇳🇱 Hollandalı",  "Dutch"),
-                            "SWE": ("🇸🇪 İsveçli",     "Swedish"),
-                            "AUT": ("🇦🇹 Avusturyalı", "Austrian"),
-                            "BEL": ("🇧🇪 Belçikalı",   "Belgian"),
-                            "DEU": ("🇩🇪 Alman",        "German"),
-                            "CHE": ("🇨🇭 İsviçreli",   "Swiss"),
-                            "ITA": ("🇮🇹 İtalyan",     "Italian"),
-                            "ESP": ("🇪🇸 İspanyol",    "Spanish"),
-                            "GRC": ("🇬🇷 Yunan",       "Greek"),
-                        }
-                        _dest_code = next((k for k in _NATL_MAP if k in _mc), None)
-                        if _dest_code:
-                            _dest_label, _dest_val = _NATL_MAP[_dest_code]
-                            _natl_btns = [[
-                                InlineKeyboardButton("🇹🇷 Türk",  callback_data="vfs_pick:Turkish"),
-                                InlineKeyboardButton(_dest_label, callback_data=f"vfs_pick:{_dest_val}"),
-                            ]]
-                            val = await wait_input_func("🌍 *Vatandaşlık (Nationality) seçin:*", _natl_btns)
+                        _cust_natl = (_cust.nationality if _cust else "") or ""
+                        if _cust_natl:
+                            val = _cust_natl
                         else:
-                            val = await wait_input_func("🌍 *Vatandaşlık* girin (örn: Turkish):")
+                            _mc = (site.get("mission_code") or "").upper()
+                            _NATL_MAP = {
+                                "DNK": ("🇩🇰 Danimarkalı", "Danish"),
+                                "FRA": ("🇫🇷 Fransız",     "French"),
+                                "NLD": ("🇳🇱 Hollandalı",  "Dutch"),
+                                "SWE": ("🇸🇪 İsveçli",     "Swedish"),
+                                "AUT": ("🇦🇹 Avusturyalı", "Austrian"),
+                                "BEL": ("🇧🇪 Belçikalı",   "Belgian"),
+                                "DEU": ("🇩🇪 Alman",        "German"),
+                                "CHE": ("🇨🇭 İsviçreli",   "Swiss"),
+                                "ITA": ("🇮🇹 İtalyan",     "Italian"),
+                                "ESP": ("🇪🇸 İspanyol",    "Spanish"),
+                                "GRC": ("🇬🇷 Yunan",       "Greek"),
+                            }
+                            _dest_code = next((k for k in _NATL_MAP if k in _mc), None)
+                            if _dest_code:
+                                _dest_label, _dest_val = _NATL_MAP[_dest_code]
+                                _natl_btns = [[
+                                    InlineKeyboardButton("🇹🇷 Türk",  callback_data="vfs_pick:Turkish"),
+                                    InlineKeyboardButton(_dest_label, callback_data=f"vfs_pick:{_dest_val}"),
+                                ]]
+                                val = (await wait_input_func("🌍 *Vatandaşlık (Nationality) seçin:*", _natl_btns)) if wait_input_func else ""
+                            else:
+                                val = (await wait_input_func("🌍 *Vatandaşlık* girin (örn: Turkish):")) if wait_input_func else ""
                         if val:
                             await select_mat_option(
                                 'mat-select[formcontrolname="nationality"]', val, "Vatandaşlık"
@@ -2188,21 +2308,30 @@ async def fetch_site(site: dict[str, Any], proxies: list[dict], dynamic_config: 
                             )
 
                     if _has_passport:
-                        val = await wait_input_func("🛂 *Pasaport Numarası* girin:")
+                        val = (_cust.passport_no if _cust else "") or (await wait_input_func("🛂 *Pasaport Numarası* girin:") if wait_input_func else "")
                         if val:
-                            await _yd_write("ENTER PASSPORT NUMBER", val, "passportNumber")
+                            await _yd_write("Passport Number", val, "passportNumber")
 
                     if _has_passport_exp:
-                        val = await wait_input_func("📅 *Pasaport Son Geçerlilik Tarihi* girin (DD/MM/YYYY):")
+                        val = (await wait_input_func("📅 *Pasaport Son Geçerlilik Tarihi* girin (DD/MM/YYYY):")) if wait_input_func else ""
                         if val:
                             await _yd_write("Expiry", val, "passportExpiry")
 
                     if _has_phone:
-                        # Telefon iki ayrı kutucuk: ülke kodu + numara
-                        val_code = await wait_input_func("📞 *Telefon Ülke Kodu* girin (sadece rakam, örn: `90` Türkiye, `44` UK):")
-                        val_num  = await wait_input_func("📞 *Telefon Numarası* girin (başında 0 olmadan):")
+                        _cust_phone = (_cust.phone if _cust else "") or ""
+                        if _cust_phone:
+                            # Telefon numarasını ülke kodu + numara olarak ayır
+                            _ph = _cust_phone.lstrip("+").strip()
+                            if _ph.startswith("90") and len(_ph) > 10:
+                                val_code, val_num = "90", _ph[2:]
+                            elif _ph.startswith("0"):
+                                val_code, val_num = "90", _ph[1:]
+                            else:
+                                val_code, val_num = "", _ph
+                        else:
+                            val_code = (await wait_input_func("📞 *Telefon Ülke Kodu* girin (sadece rakam, örn: `90` Türkiye, `44` UK):")) if wait_input_func else ""
+                            val_num  = (await wait_input_func("📞 *Telefon Numarası* girin (başında 0 olmadan):")) if wait_input_func else ""
                         if val_code:
-                            # Ülke kodu — genellikle küçük ilk kutucuk
                             try:
                                 _code_inputs = page.locator('input[formcontrolname="countryCode"], input[maxlength="4"]')
                                 if await _code_inputs.first.is_visible(timeout=2000):
@@ -2211,12 +2340,12 @@ async def fetch_site(site: dict[str, Any], proxies: list[dict], dynamic_config: 
                             except Exception as _ce:
                                 logger.debug(f"Ülke kodu fill: {_ce}")
                         if val_num:
-                            await _yd_write("012345648382", val_num, "contactNumber")
+                            await _yd_write("Contact number", val_num, "contactNumber")
 
                     if _has_email:
-                        val = await wait_input_func("📧 *E-posta* girin:")
+                        val = (_cust.email if _cust else "") or (await wait_input_func("📧 *E-posta* girin:") if wait_input_func else "")
                         if val:
-                            await _yd_write("ENTER EMAIL ADDRESS", val, "email")
+                            await _yd_write("Email", val, "email")
 
                 # VFS sayım bekleme süresi dolmadıysa bekle (Save düğmesine tıklamadan önce)
                 if _yd_wait_secs > 0:
@@ -3417,6 +3546,20 @@ async def fetch_site(site: dict[str, Any], proxies: list[dict], dynamic_config: 
                 _vfs_api_cats.clear()
                 _vfs_api_subcats.clear()
 
+                # Merkez retry sonrası navigate edilmişse Angular formun hazır olmasını bekle.
+                # _sel_center None ise ya ilk iterasyon ya da retry — her iki durumda da
+                # center dropdown'ının visible olmasını beklemek zararsız (ilk iterasyonda zaten hazır).
+                if not center_text:
+                    _cw_ready = await wait_first_visible(page, [center_sel], timeout_ms=30000)
+                    if not _cw_ready:
+                        logger.warning("Merkez dropdown 30s içinde yüklenemedi (retry sonrası navigate)")
+                    else:
+                        # networkidle bekle — Angular API çağrılarının tamamlanması için
+                        try:
+                            await page.wait_for_load_state("networkidle", timeout=10000)
+                        except Exception:
+                            pass
+
                 # === BOOKING MODUNDA: merkez daha önce seçilmediyse VFS'den çekip sor ===
                 if booking_mode and wait_input_func and not center_text:
                     center_options = []
@@ -4387,13 +4530,24 @@ async def fetch_site(site: dict[str, Any], proxies: list[dict], dynamic_config: 
             # Hesaba özel proxy tanımlıysa sadece onu kullan, yoksa global havuz
             _acct_proxy_str = try_account.get("proxy", "").strip()
             _ip_reset_url = try_account.get("ip_reset_url", "").strip() if _acct_proxy_str else ""
+            # Hesaba özel ip_reset_url yoksa proxy_rotation.json'dan global URL'yi al
+            if not _ip_reset_url:
+                try:
+                    _rot_file = DATA_DIR / "proxy_rotation.json"
+                    if _rot_file.exists():
+                        _rot_data = json.loads(_rot_file.read_text(encoding="utf-8"))
+                        if _rot_data:
+                            _ip_reset_url = list(_rot_data.values())[0].get("url", "")
+                except Exception:
+                    pass
             if _acct_proxy_str and use_proxy:
                 _acct_proxy = _parse_proxy_line(_acct_proxy_str)
                 # ip_reset_url varsa aynı proxy ile bir reset denemesi için listeye iki kez ekle
                 _this_proxy_pool = [_acct_proxy, _acct_proxy] if _ip_reset_url else [_acct_proxy]
                 logger.info(f"Hesaba özel proxy: {_acct_proxy.get('server') if _acct_proxy else 'None'}")
             else:
-                _this_proxy_pool = proxy_pool
+                # Global proxy havuzu — ip_reset_url varsa her proxy için bir retry şansı
+                _this_proxy_pool = (proxy_pool + proxy_pool) if (_ip_reset_url and proxy_pool != [None]) else proxy_pool
             _ip_reset_done = False  # Bu hesap için IP reset bir kez yapılabilir
 
             for try_proxy in _this_proxy_pool:
@@ -5404,6 +5558,7 @@ class VisaWatchService:
                     if not action:
                         return
                     dynamic_config["_action"] = action
+                    dynamic_config["customer"] = c   # form auto-fill için
 
                     # 2. VFS giriş bilgileri — müşteri kaydından veya manuel
                     if c.vfs_email and c.vfs_password:

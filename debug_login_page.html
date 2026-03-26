@@ -1,0 +1,519 @@
+<!DOCTYPE html><html><head>
+    <title>Waiting Room powered by Cloudflare</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type="text/css">
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body,
+      #wrapper {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+      }
+
+      #wrapper {
+        display: table;
+        width: 100%;
+      }
+
+      main,
+      footer {
+        /* Old browsers */
+        display: block;
+        /* Modern browsers */
+        display: table-row;
+      }
+
+      body {
+        font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI',
+          Roboto, Oxygen, Ubuntu, 'Helvetica Neue', Arial, sans-serif;
+        font-size: 16px;
+        margin: 0;
+        padding: 0;
+      }
+
+      main .content-container {
+        max-width: 1024px;
+      }
+
+      .center {
+        height: 100%;
+        display: flex;
+        align-items: center;
+      }
+
+      .content-container {
+        width: 100%;
+        min-width: 400px;
+        margin: 0 auto;
+        padding: 32px 64px;
+        display: flex;
+      }
+
+      @media (max-width: 900px) {
+        .content-container {
+          display: block;
+        }
+      }
+
+      main .content-container section {
+        flex: 1 0 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      footer {
+        height: 100px;
+        background: #404242;
+        color: white;
+        font-size: 12px;
+      }
+
+      footer .content-container {
+        justify-content: space-between;
+      }
+
+      p {
+        line-height: 1.5;
+        max-width: 34rem;
+      }
+
+      h1 {
+        font-size: 32px;
+        margin: 0 0 32px 0;
+      }
+
+      h2 {
+        font-size: 20px;
+        margin: 0 0 20px 0;
+      }
+
+      .links {
+        color: #cac8c8;
+        margin-top: 15px;
+        display: flex;
+        align-items: flex-end;
+      }
+
+      .links a,
+      .links a:visited {
+        text-decoration: none;
+        color: #cac8c8;
+      }
+
+      .logo {
+        display: flex;
+        align-items: flex-end;
+      }
+
+      .logo .cloudflare-logo {
+        width: 140px;
+        margin-right: 1rem;
+      }
+
+      .main_logo {
+          max-height: 90px;
+          margin-right:90px;
+
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="wrapper">
+      <main>
+        <div class="center">
+          <section class="content-container">
+
+
+            <section>
+              <img src="https://www.vfsglobal.com/en/assets/images/vfs-global-logo.svg" alt="VFS Global Logo" class="main_logo" style="margin-bottom:20px;">
+              <h1 id="message-4">You are now in line.<br> Thanks for your patience.</h1>
+            </section>
+            <section>
+              <h2>
+                    <p id="message-5">Your estimated wait time is 1 minute...</p>
+              </h2>
+              <p id="message-8">We are experiencing a high volume of traffic and using a virtual queue to limit the amount of users on the website at the same time.This will ensure you have the best possible online experience.</p>
+              <p>
+                  <strong>
+                      </strong></p><p id="message-9">This page will automatically refresh, please do not close your browser.</p><strong>
+
+                  </strong>
+              <p></p>
+              <p>
+                <strong>
+                    <span id="message-11">Last updated </span>
+                  <span id="last-updated">12:05:55</span>
+                </strong>
+              </p>
+              
+            </section>
+          </section>
+	
+        </div>
+      </main>
+      <!--<footer>
+        <div class="center">
+          <section class="content-container">
+            <section class="logo">
+              <div class="cloudflare-logo">
+                <svg
+                  version="1.1"
+                  id="Layer_1"
+                  xmlns="http://www.w3.org/2000/svg"
+                  xmlns:xlink="http://www.w3.org/1999/xlink"
+                  x="0px"
+                  y="0px"
+                  viewBox="0 0 2572.531 854.222"
+                  style="enable-background: new 0 0 2572.531 854.222"
+                  xml:space="preserve"
+                >
+                  <style type="text/css">
+                    .st0 {
+                      fill: #f78100;
+                    }
+
+                    .st1 {
+                      fill: #fbac42;
+                    }
+
+                    .st2 {
+                      fill: #ffffff;
+                    }
+
+                    .st3 {
+                      fill: #f8fbfb;
+                    }
+
+                    .st4 {
+                      fill: #4e4e4e;
+                    }
+
+                    .st5 {
+                      fill: #fcad32;
+                    }
+
+                    .st6 {
+                      fill: #747474;
+                    }
+                  </style>
+                  <g>
+                    <g>
+                      <path
+                        class="st0"
+                        d="M2093.89,545.07l6.251-21.622c7.449-25.73,4.677-49.514-7.824-66.989
+			c-11.499-16.098-30.664-25.573-53.938-26.674l-440.852-5.622c-2.968-0.157-5.425-1.494-6.938-3.695
+			c-1.533-2.26-1.887-5.17-0.944-7.961c1.455-4.344,5.759-7.627,10.241-7.823l444.941-5.641
+			c52.777-2.418,109.919-45.249,129.929-97.476l25.376-66.301c0.699-1.805,1.014-3.718,1.001-5.636
+			c-0.007-1.047-0.083-2.096-0.313-3.13C2171.985,96.906,2056.347,0,1918.065,0c-127.413,0-235.602,82.242-274.403,196.544
+			c-25.042-18.792-57.082-28.777-91.52-25.337c-61.131,6.074-110.252,55.293-116.326,116.425
+			c-1.592,15.863-0.295,31.175,3.361,45.563c-99.854,2.909-179.934,84.719-179.934,185.281c0,9.101,0.688,18.044,1.965,26.791
+			c0.629,4.246,4.207,7.43,8.492,7.43l813.891,0.098c0.081,0,0.152-0.037,0.232-0.038
+			C2088.48,552.653,2092.576,549.573,2093.89,545.07z"
+                      />
+                      <path
+                        class="st1"
+                        d="M2240.755,240.122c-4.089,0-8.158,0.118-12.207,0.315c-0.668,0.035-1.303,0.197-1.912,0.41
+			c-2.114,0.741-3.796,2.453-4.437,4.681l-17.337,59.873c-7.45,25.73-4.678,49.495,7.823,66.969
+			c11.499,16.118,30.664,25.573,53.937,26.674l93.977,5.641c2.772,0.137,5.209,1.474,6.703,3.636c1.572,2.28,1.926,5.209,0.982,8
+			c-1.474,4.344-5.759,7.627-10.221,7.823l-97.653,5.641c-53.014,2.438-110.154,45.249-130.165,97.476l-7.057,18.438
+			c-1.284,3.336,1.106,6.889,4.635,7.064c0.089,0.004,0.169,0.033,0.26,0.033h336.006c4.01,0,7.587-2.615,8.668-6.467
+			c5.838-20.757,8.944-42.634,8.944-65.259C2481.702,347.996,2373.828,240.122,2240.755,240.122z"
+                      />
+                    </g>
+                    <path
+                      class="st2"
+                      d="M2550.811,695.031c-12.01,0-21.74-9.71-21.74-21.72c0-11.951,9.73-21.661,21.74-21.661
+		c11.991,0,21.72,9.71,21.72,21.661C2572.531,685.321,2562.802,695.031,2550.811,695.031 M2550.811,655.659
+		c-9.612,0-17.415,7.922-17.415,17.651c0,9.789,7.804,17.71,17.415,17.71c9.592,0,17.396-7.922,17.396-17.71
+		C2568.207,663.581,2560.403,655.659,2550.811,655.659 M2561.779,684.77h-5.15l-4.324-8.334h-5.819v8.275h-4.501v-23.882h11.46
+		c5.032,0,8.216,3.067,8.216,7.804c0,3.42-1.985,6.172-4.973,7.253L2561.779,684.77z M2553.504,672.288
+		c1.867,0,3.715-0.963,3.715-3.656c0-2.713-1.435-3.656-3.715-3.656h-7.018v7.312H2553.504z"
+                    />
+                    <polygon
+                      class="st2"
+                      points="276.215,649.424 331.862,649.424 331.862,801.446 429.101,801.446 429.101,850.194 276.215,850.194 	
+		"
+                    />
+                    <path
+                      class="st2"
+                      d="M486.732,750.387v-0.57c0-57.652,46.467-104.414,108.424-104.414s107.835,46.192,107.835,103.844v0.57
+		c0,57.652-46.467,104.395-108.404,104.395C532.629,854.212,486.732,808.039,486.732,750.387 M646.204,750.387v-0.57
+		c0-28.973-20.934-54.212-51.618-54.212c-30.408,0-50.773,24.669-50.773,53.642v0.57c0,28.973,20.934,54.212,51.342,54.212
+		C625.84,804.029,646.204,779.361,646.204,750.387"
+                    />
+                    <path
+                      class="st2"
+                      d="M771.099,762.145V649.416h56.512v111.589c0,28.973,14.624,42.733,36.993,42.733
+		c22.369,0,36.993-13.19,36.993-41.298V649.416h56.512V760.71c0,64.827-36.993,93.211-94.075,93.211
+		C806.951,853.921,771.099,824.967,771.099,762.145"
+                    />
+                    <path
+                      class="st2"
+                      d="M1043.266,649.434h77.446c71.706,0,113.299,41.298,113.299,99.225v0.59
+		c0,57.927-42.163,100.955-114.439,100.955h-76.306V649.434z M1121.577,800.866c33.278,0,55.352-18.359,55.352-50.772v-0.57
+		c0-32.118-22.074-50.772-55.352-50.772h-22.664v102.115H1121.577z"
+                    />
+                    <polygon
+                      class="st2"
+                      points="1314.882,649.424 1475.493,649.424 1475.493,698.192 1370.529,698.192 1370.529,732.315 
+		1465.468,732.315 1465.468,778.488 1370.529,778.488 1370.529,850.194 1314.882,850.194 	"
+                    />
+                    <polygon
+                      class="st2"
+                      points="1552.924,649.424 1608.571,649.424 1608.571,801.446 1705.811,801.446 1705.811,850.194 
+		1552.924,850.194 	"
+                    />
+                    <path
+                      class="st2"
+                      d="M1851.218,647.991h53.622l85.485,202.205h-59.657l-14.644-35.853h-77.446l-14.329,35.853h-58.517
+		L1851.218,647.991z M1899.966,771.04l-22.369-57.082l-22.664,57.082H1899.966z"
+                    />
+                    <path
+                      class="st2"
+                      d="M2061.997,649.42h94.94c30.703,0,51.912,8.04,65.397,21.799c11.774,11.479,17.789,26.968,17.789,46.762v0.57
+		c0,30.683-16.354,51.048-41.298,61.662l47.902,69.996h-64.256l-40.433-60.817h-24.394v60.817h-55.647V649.42z M2154.363,745.795
+		c18.929,0,29.838-9.179,29.838-23.804v-0.57c0-15.784-11.479-23.804-30.133-23.804h-36.423v48.177H2154.363z"
+                    />
+                    <polygon
+                      class="st2"
+                      points="2320.411,649.424 2481.888,649.424 2481.888,696.757 2375.488,696.757 2375.488,727.145 
+		2471.863,727.145 2471.863,771.038 2375.488,771.038 2375.488,802.881 2483.323,802.881 2483.323,850.194 2320.411,850.194 	"
+                    />
+                    <path
+                      class="st2"
+                      d="M154.381,773.925c-7.784,17.573-24.197,30.094-45.977,30.094c-30.408,0-51.342-25.239-51.342-54.212v-0.57
+		c0-28.973,20.364-53.642,50.772-53.642c22.919,0,40.374,14.094,47.745,33.278h58.655c-9.396-47.785-51.381-83.461-105.83-83.461
+		C46.447,645.412,0,692.155,0,749.807v0.57c0,57.652,45.878,103.845,107.835,103.845c52.993,0,94.41-34.32,105.339-80.296H154.381z"
+                    />
+                  </g>
+                </svg>
+              </div>
+              <span id="message-12" class="waitingrooms-text">
+                Waiting Room powered by Cloudflare
+              </span>
+            </section>
+            <section class="links">
+              <span>
+                &#169;
+                <span id="year"></span>
+                Cloudflare, Inc. |
+                <a
+                  target="_blank" id="message-13"
+                  href="https://www.cloudflare.com/privacypolicy/"
+                >
+              
+                </a>
+                |
+                <a
+                  target="_blank" id="message-14"
+                  href="https://www.cloudflare.com/website-terms/"
+                >
+                
+                </a>
+                |
+                <a target="_blank" id="message-15" href="https://www.cloudflare.com/abuse/">
+                  
+                </a>
+                |
+                <a target="_blank" id="message-16" href="https://www.cloudflare.com/trademark/">
+                  
+                </a>
+              </span>
+            </section>
+          </section>
+
+        </div>
+      </footer>-->
+    </div>
+    <script>
+        //const url = new URL("https://abc.mysite.com/chn/ru/deu/login");
+        //var locale = url.pathname.split("/")[2] || "en";
+        var locale = location.pathname.split("/")[2] || "en";
+        //var locale = "en";
+        var translations = {
+            "en": {
+                "message_1": "We are experiencing a surge in customers trying to access our website at the moment.We apologise for this inconvenience.\n You are now in a queue to access the website.Thank you for your patience.",
+                "message_2": "You are now in the pre-queue. \n Thank you for your patience.",
+                "message_3": "When the event starts, you will either be admitted into the website or placed in a virtual queue if we are experiencing a high volume of traffic. Placing you on a virtual queue will limit the number of users visiting the website at the same time, this will guarantee that you have the best online experience.",
+                "message_4": "You are now in line.\n Thanks for your patience.",
+                "message_5": "Your estimated wait time is 1 minute...",
+                "message_6": "The estimated wait time is greater than a day. You will automatically be placed in the queue once space is available.",
+                "message_7": "Your estimated wait time is unavailable.",
+                "message_8": "We are experiencing a high volume of traffic and using a virtual queue to limit the amount of users on the website at the same time.This will ensure you have the best possible online experience.",
+                "message_9": "This page will automatically refresh, please do not close your browser.",
+                "message_10": "This page will not automatically refresh, please come back later.",
+                "message_11": "Last updated ",
+                "message_12": "Waiting Room powered by Cloudflare",
+                "message_13": "Privacy Policy",
+                "message_14": "Terms of Use",
+                "message_15": "Trust & Safety",
+                "message_16": "Trademark",
+            },
+            "ru": {
+                "message_1": "В данный момент наблюдается всплеск обращений к нашему сайту. Приносим извинения за доставленные неудобства. \n Вы находитесь в очереди для доступа к сайту.Спасибо за ваше терпение.",
+                "message_2": "Вы находитесь в предварительной очереди. \n Спасибо за ваше терпение.",
+                "message_3": "Когда мероприятие начнется, вы либо получите доступ к сайту, либо будете помещены в виртуальную очередь, если наблюдается высокий трафик. Виртуальная очередь ограничивает число пользователей на сайте, обеспечивая лучший онлайн-опыт.",
+                "message_4": "Вы находитесь в очереди. \n Спасибо за ваше терпение.",
+                "message_5": "Ваше ожидаемое время ожидания: 1 minute...",
+                "message_6": "Ожидаемое время ожидания превышает один день. Вы будете автоматически поставлены в очередь, как только освободится место.",
+                "message_7": "Ожидаемое время ожидания недоступно.",
+                "message_8": "Мы наблюдаем высокий трафик и используем виртуальную очередь, чтобы ограничить количество пользователей на сайте одновременно. Это обеспечит лучший онлайн-опыт.",
+                "message_9": "Эта страница обновится автоматически, пожалуйста, не закрывайте браузер.",
+                "message_10": "Эта страница не обновляется автоматически, пожалуйста, зайдите позже.",
+                "message_11": "Последнее обновление ",
+                "message_12": "Зал ожидания работает на Cloudflare ",
+                "message_13": "Политика конфиденциальности",
+                "message_14": "Условия использования",
+                "message_15": "Доверие и безопасность",
+                "message_16": "Торговая марка",
+            },
+            "tr": {
+                "message_1": "Şu anda web sitemize erişmeye çalışan müşterilerde bir artış yaşıyoruz. Bu rahatsızlıktan dolayı özür dileriz. \n Şu anda web sitesine erişim için sıradasınız.Sabırlı olduğunuz için teşekkür ederiz.",
+                "message_2": "Şu anda ön sıradasınız. \n Sabırlı olduğunuz için teşekkür ederiz.",
+                "message_3": "Etkinlik başladığında, ya siteye giriş yapacaksınız ya da yoğun trafik olması durumunda sanal sıraya alınacaksınız. Sanal sıra, aynı anda siteyi ziyaret eden kullanıcı sayısını sınırlayarak size en iyi çevrimiçi deneyimi sunar.",
+                "message_4": "Şu anda sıradasınız. \n Sabırlı olduğunuz için teşekkür ederiz.",
+                "message_5": "Tahmini bekleme süreniz: 1 minute...",
+                "message_6": "Tahmini bekleme süresi bir günden fazladır. Yer açıldığında otomatik olarak sıraya alınacaksınız.",
+                "message_7": "Tahmini bekleme süresi mevcut değil.",
+                "message_8": "Yoğun trafik yaşıyoruz ve aynı anda web sitesinde bulunan kullanıcı sayısını sınırlamak için sanal sıra kullanıyoruz. Bu, size mümkün olan en iyi çevrimiçi deneyimi sağlar.",
+                "message_9": "Bu sayfa otomatik olarak yenilenecektir, lütfen tarayıcınızı kapatmayın.",
+                "message_10": "Bu sayfa otomatik olarak yenilenmeyecek, lütfen daha sonra tekrar gelin.",
+                "message_11": "Son güncelleme ",
+                "message_12": "Bekleme Odası Cloudflare tarafından desteklenmektedir",
+                "message_13": "Gizlilik Politikası",
+                "message_14": "Kullanım Şartları",
+                "message_15": "Güven ve Güvenlik",
+                "message_16": "Ticari Marka",
+            },
+            "zh": {
+                "message_1": "由于当前网站访问量过大，给您带来不便，我们深表歉意。 \n 您目前已经进入网站排队系统， 感谢您的耐心等待。",
+                "message_2": "您目前在预排队中，\n 感谢您的耐心等待。",
+                "message_3": "若访问流量过大，系统将自动启用虚拟排队机制.此举措通过调控实时访问人数，从而确保您获得最佳在线体验度。",
+                "message_4": "您目前正在排队，\n 感谢您的耐心等待。",
+                "message_5": "目前预计等待时间为 1 minute…",
+                "message_6": "当前预计等待时间1天以上。一旦系统中有空余资源，您的访问请求将自动加入排队系统。",
+                "message_7": "当前无法获取预计等待时间",
+                "message_8": "当前访问量较大，系统已自动启用排队功能进行流量管控，稍作等待即可获得更流畅的体验。",
+                "message_9": "此页面将自动刷新，请勿关闭浏览器",
+                "message_10": "此页面无法自动更新， 请稍后重试。",
+                "message_11": "最后更新时间",
+                "message_12": "排队系统由Cloudflare流量管理",
+                "message_13": "隐私政策",
+                "message_14": "使用条款",
+                "message_15": "安全守则",
+                "message_16": "商标",
+            },
+            "it": {
+                "message_1": "Al momento stiamo riscontrando un aumento di utenti che cercano di accedere al nostro sito web. Ci scusiamo per l'inconveniente. \n Siete ora in coda per accedere al sito.Grazie per la vostra pazienza.",
+                "message_2": "Siete ora nella coda preliminare. \n Grazie per la vostra pazienza.",
+                "message_3": "Dal momento che il volume di traffico è elevato, sarete ammessi al sito web o inseriti in una coda virtuale. L'inserimento in una coda virtuale limiterà il numero di utenti che visitano il sito web nello stesso momento, garantendo un'esperienza online ottimale.",
+                "message_4": "Siete ora in coda. \n Grazie per la pazienza",
+                "message_5": "Il tempo di attesa stimato è 1 minute…",
+                "message_6": "Il tempo di attesa stimato è superiore a un giorno. Verrete automaticamente inseriti nella coda di attesa una volta che si sarà liberato un posto.",
+                "message_7": "Il tempo di attesa stimato non è disponibile.",
+                "message_8": "Stiamo registrando un elevato volume di traffico e stiamo utilizzando una coda virtuale per limitare la quantità di utenti presenti contemporaneamente sul sito web, in modo da garantirvi la migliore esperienza online possibile.",
+                "message_9": "Questa pagina si aggiorna automaticamente, si prega di non chiudere il browser.",
+                "message_10": "Questa pagina non si aggiornerà automaticamente, si prega di riprovare più tardi.",
+                "message_11": "Ultimo aggiornamento",
+                "message_12": "Lista d'attesa gestita da Cloudflare",
+                "message_13": "Informativa sulla privacy",
+                "message_14": "Termini di utilizzo",
+                "message_15": "Affidabilità & sicurezza",
+                "message_16": "Marchio registrato",
+            }
+        };
+
+        locale = translations.hasOwnProperty(locale) ? locale : 'en';
+        var message1 = document.getElementById('message-1');
+        if (message1) {
+            message1.innerText = translations[locale]["message_1"];
+        } 
+
+        var message2 = document.getElementById('message-2');
+        if (message2) {
+            message2.innerText = translations[locale]["message_2"];
+        }
+
+        var message3 = document.getElementById('message-3');
+        if (message3) {
+            message3.innerText = translations[locale]["message_3"];
+        }
+
+        var message4 = document.getElementById('message-4');
+        if (message4) {
+            message4.innerText = translations[locale]["message_4"];
+        }
+
+        var message5 = document.getElementById('message-5');
+        if (message5) {
+            message5.innerText = translations[locale]["message_5"];
+        }
+
+        var message6 = document.getElementById('message-6');
+        if (message6) {
+            message6.innerText = translations[locale]["message_6"];
+        }
+
+        var message7 = document.getElementById('message-7');
+        if (message7) {
+            message7.innerText = translations[locale]["message_7"];
+        }
+
+        var message8 = document.getElementById('message-8');
+        if (message8) {
+            message8.innerText = translations[locale]["message_8"];
+        }
+
+        var message9 = document.getElementById('message-9');
+        if (message9) {
+            message9.innerText = translations[locale]["message_9"];
+        }
+
+        var message10 = document.getElementById('message-10');
+        if (message10) {
+            message10.innerText = translations[locale]["message_10"];
+        }
+
+        var message11 = document.getElementById('message-11');
+        if (message11) {
+            message11.innerText = translations[locale]["message_11"];
+        }
+
+        var message12 = document.getElementById('message-12');
+        if (message12) {
+            message12.innerText = translations[locale]["message_12"];
+        }
+
+        var message13 = document.getElementById('message-13');
+        if (message13) {
+            message13.innerText = translations[locale]["message_13"];
+        }
+
+        var message14 = document.getElementById('message-14');
+        if (message14) {
+            message14.innerText = translations[locale]["message_14"];
+        }
+
+        var message15 = document.getElementById('message-15');
+        if (message15) {
+            message15.innerText = translations[locale]["message_15"];
+        }
+
+        var message16 = document.getElementById('message-16');
+        if (message16) {
+            message16.innerText = translations[locale]["message_16"];
+        }
+
+        if (document.getElementById('last-updated')) {
+            var date = new Date();
+            document.getElementById('last-updated').innerText = date.toLocaleTimeString();
+        }
+    </script>
+  <script defer="" src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon="{&quot;rayId&quot;:&quot;9ddad6b2fddf3815&quot;,&quot;serverTiming&quot;:{&quot;name&quot;:{&quot;cfExtPri&quot;:true,&quot;cfEdge&quot;:true,&quot;cfOrigin&quot;:true,&quot;cfL4&quot;:true,&quot;cfSpeedBrain&quot;:true,&quot;cfCacheStatus&quot;:true}},&quot;version&quot;:&quot;2025.9.1&quot;,&quot;token&quot;:&quot;56589b51a3284db98432e08280dc099f&quot;}" crossorigin="anonymous"></script>
+
+</body></html>
