@@ -104,3 +104,9 @@ Telegram: [https://t.me/gogost](https://t.me/gogost)
 Google group: [https://groups.google.com/d/forum/go-gost](https://groups.google.com/d/forum/go-gost)
 
 Legacy version: [v2.gost.run](https://v2.gost.run/en/)
+
+## License
+
+MIT License - Copyright (c) 2026 kaven0667
+
+See [LICENSE](LICENSE) file for full details.
