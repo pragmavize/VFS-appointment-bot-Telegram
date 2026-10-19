@@ -1,7 +1,9 @@
 [
   {
     "key": "vfs_fr",
+    "provider": "VFS",
     "group_key": "france",
+    "name": "France",
     "menu_label": "France 🇫🇷",
     "url": "https://visa.vfsglobal.com/tur/en/fra/login",
     "telegram_chat_id": "BURAYA_TELEGRAM_CHAT_ID_YAZ",
@@ -20,7 +22,9 @@
   },
   {
     "key": "vfs_nl",
+    "provider": "VFS",
     "group_key": "netherlands",
+    "name": "Netherlands",
     "menu_label": "Hollanda 🇳🇱",
     "url": "https://visa.vfsglobal.com/tur/en/nld/login",
     "telegram_chat_id": "BURAYA_TELEGRAM_CHAT_ID_YAZ",
