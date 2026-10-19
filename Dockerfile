@@ -6,11 +6,13 @@
 FROM mcr.microsoft.com/playwright/python:v1.53.0-noble AS browser
 
 WORKDIR /tmp/browser
-RUN pip install --no-cache-dir camoufox
+RUN pip install --no-cache-dir camoufox[geoip]
 
 ARG GITHUB_TOKEN
 ENV XDG_CACHE_HOME=/tmp/browser/.cache
 RUN GITHUB_TOKEN=$GITHUB_TOKEN python -m camoufox fetch
+# GeoIP veritabanı (runtime'da indirilmesin diye build'de çek)
+RUN python -c "from camoufox.geolocation import download_mmdb; download_mmdb()"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Stage 2 — Runtime
