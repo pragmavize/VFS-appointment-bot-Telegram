@@ -25,6 +25,8 @@ COPY optimizer.py .
 COPY dashboard.py .
 COPY watchdog.py .
 COPY auto_booking.py .
+COPY start_render.sh .
+RUN chmod +x start_render.sh
 
 # data/ klasörü (volume mount noktası)
 RUN mkdir -p data/cookies

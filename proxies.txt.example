@@ -1,0 +1,16 @@
+# VISABot — proxy listesi (her satıra bir proxy)
+#
+# Formatlar:
+#   ip:port:user:pass:http
+#   ip:port:user:pass:socks5
+#   ip:port
+#   http://user:pass@host:port
+#   socks5://host:port
+#
+# socks5 için gost binary image içinde hazır gelir.
+# Yorum satırları (# ile başlayan) görmezden gelinir.
+#
+# ── Örnekler ────────────────────────────────────────────────────────────────
+# 1.2.3.4:8080:myuser:mypass:http
+# 1.2.3.4:8080:myuser:mypass:socks5
+# 5.6.7.8:3128

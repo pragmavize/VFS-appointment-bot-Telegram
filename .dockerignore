@@ -1,0 +1,17 @@
+# Build context'i küçült + hassas/gereksiz dosyaları image'dan çıkar
+.git
+.github
+data/
+*.log
+__pycache__/
+*.py[cod]
+.env
+.env.*
+debug_login_page.html
+screenshots/
+node_modules/
+dist/
+.wrangler/
+*.har
+*.pid
+gost

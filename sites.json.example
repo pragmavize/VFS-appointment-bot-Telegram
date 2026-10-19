@@ -1,0 +1,40 @@
+[
+  {
+    "key": "vfs_fr",
+    "group_key": "france",
+    "menu_label": "France 🇫🇷",
+    "url": "https://visa.vfsglobal.com/tur/en/fra/login",
+    "telegram_chat_id": "BURAYA_TELEGRAM_CHAT_ID_YAZ",
+    "enabled": true,
+    "accounts": [
+      {
+        "email": "ornek@gmail.com",
+        "password": "GMAIL_SIFREN",
+        "imap_app_password": "GMAIL_IMAP_APP_SIFREN"
+      }
+    ],
+    "vfs_options": {
+      "center": "Istanbul",
+      "category": "Schengen Visa"
+    }
+  },
+  {
+    "key": "vfs_nl",
+    "group_key": "netherlands",
+    "menu_label": "Hollanda 🇳🇱",
+    "url": "https://visa.vfsglobal.com/tur/en/nld/login",
+    "telegram_chat_id": "BURAYA_TELEGRAM_CHAT_ID_YAZ",
+    "enabled": false,
+    "accounts": [
+      {
+        "email": "ornek2@gmail.com",
+        "password": "GMAIL_SIFREN",
+        "imap_app_password": "GMAIL_IMAP_APP_SIFREN"
+      }
+    ],
+    "vfs_options": {
+      "center": "Ankara",
+      "category": "Schengen Visa"
+    }
+  }
+]

@@ -1,0 +1,37 @@
+# Render — VISABot Blueprint
+# Bu dosya repo kökünde kalmalı. Render'ın "Blueprint" olarak okuması için.
+services:
+  - type: web
+    name: visabot
+    runtime: docker
+    plan: free
+    region: frankfurt
+    healthCheckPath: /healthz
+    dockerCommand: bash start_render.sh
+    autoDeployTrigger: commit
+    envVars:
+      # ── Zorunlu / senin dolduracağın ──────────────────────────────────────
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: ALLOWED_USERS
+        sync: false
+      - key: ADMIN_CHAT_ID
+        sync: false
+      - key: WATCHDOG_NOTIFY_ID
+        sync: false
+      - key: DASHBOARD_USER
+        sync: false
+      - key: DASHBOARD_PASS
+        sync: false
+      - key: SITES_JSON
+        sync: false
+      - key: PROXIES_TXT
+        sync: false
+
+      # ── Sabit değerler ────────────────────────────────────────────────────
+      - key: LOG_LEVEL
+        value: INFO
+      - key: PYTHONUNBUFFERED
+        value: "1"

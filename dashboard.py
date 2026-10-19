@@ -29,10 +29,10 @@ app.config["SECRET_KEY"] = "visabot_dash_2026_xK9mP"
 app.config["PERMANENT_SESSION_LIFETIME"] = 86400 * 7  # 7 gün
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 
-DASHBOARD_USER = "kaven667"
-DASHBOARD_PASS = "botan12K!"
+DASHBOARD_USER = os.getenv("DASHBOARD_USER", "kaven667")
+DASHBOARD_PASS = os.getenv("DASHBOARD_PASS", "botan12K!")
 
-_PUBLIC_PATHS = {"/login", "/logout"}
+_PUBLIC_PATHS = {"/login", "/logout", "/healthz"}
 
 # Son 500 log satırı bellekte tut
 _log_buffer: deque = deque(maxlen=500)
@@ -1096,6 +1096,12 @@ def logout():
     return redirect(url_for("login"))
 
 
+@app.route("/healthz")
+def healthz():
+    """Render health check + UptimeRobot ping noktası."""
+    return ("ok", 200)
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Routes
 # ──────────────────────────────────────────────────────────────────────────────
@@ -1351,5 +1357,6 @@ def on_connect():
 if __name__ == "__main__":
     t = threading.Thread(target=_tail_log, daemon=True)
     t.start()
-    print("🚀 Dashboard başlatılıyor → http://0.0.0.0:8585")
-    socketio.run(app, host="0.0.0.0", port=8585, debug=False, allow_unsafe_werkzeug=True)
+    _port = int(os.environ.get("PORT", "8585"))
+    print(f"🚀 Dashboard başlatılıyor → http://0.0.0.0:{_port}")
+    socketio.run(app, host="0.0.0.0", port=_port, debug=False, allow_unsafe_werkzeug=True)
