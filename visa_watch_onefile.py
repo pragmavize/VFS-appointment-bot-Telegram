@@ -4815,7 +4815,7 @@ class VisaWatchService:
                 continue
             seen.add(g)
             # Bayrakları kaldır: sadece metin bırak
-            label = s.get("menu_label", s["name"])
+            label = s.get("menu_label") or s.get("name", "")
             label = re.sub(r"[\U0001F1E0-\U0001F1FF]", "", label).strip()
             unique.append((g, label))
 
@@ -4992,7 +4992,7 @@ class VisaWatchService:
             if g in seen_keys:
                 continue
             seen_keys.add(g)
-            name = re.sub(r"[\U0001F1E0-\U0001F1FF]", "", s.get("menu_label", s["name"])).strip()
+            name = re.sub(r"[\U0001F1E0-\U0001F1FF]", "", s.get("menu_label") or s.get("name", "")).strip()
             seen.append(name)
         return seen
 
@@ -5267,7 +5267,7 @@ class VisaWatchService:
                 if g in seen:
                     continue
                 seen.add(g)
-                menu_label = s.get("menu_label", s["name"])
+                menu_label = s.get("menu_label") or s.get("name", "")
                 flags = re.findall(r"[\U0001F1E0-\U0001F1FF]{2}", menu_label)
                 name_only = re.sub(r"[\U0001F1E0-\U0001F1FF]", "", menu_label).strip()
                 unique.append((g, f"{flags[0]} {name_only}" if flags else name_only))
@@ -5830,7 +5830,7 @@ class VisaWatchService:
                 if g in seen:
                     continue
                 seen.add(g)
-                menu_label = s.get("menu_label", s["name"])
+                menu_label = s.get("menu_label") or s.get("name", "")
                 flags = re.findall(r"[\U0001F1E0-\U0001F1FF]{2}", menu_label)
                 name_only = re.sub(r"[\U0001F1E0-\U0001F1FF]", "", menu_label).strip()
                 label = f"{flags[0]} {name_only}" if flags else name_only
@@ -5882,7 +5882,7 @@ class VisaWatchService:
                 if g in seen:
                     continue
                 seen.add(g)
-                menu_label = s.get("menu_label", s["name"])
+                menu_label = s.get("menu_label") or s.get("name", "")
                 flags = re.findall(r"[\U0001F1E0-\U0001F1FF]{2}", menu_label)
                 name_only = re.sub(r"[\U0001F1E0-\U0001F1FF]", "", menu_label).strip()
                 label = f"{flags[0]} {name_only}" if flags else name_only
