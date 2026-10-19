@@ -3,6 +3,7 @@ playwright==1.53.0
 python-dotenv==1.0.1
 playwright-stealth
 camoufox
+browserforge
 flask
 flask-socketio
 setuptools<81
