@@ -25,6 +25,17 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt camoufox
 
+# fpgen modelini build'de indir (runtime'da webdl timeout'suz takılabilir)
+RUN set -eux; \
+    DATA_DIR=$(python -c "from camoufox.fpgen_model import fpgen_data_dir; print(fpgen_data_dir())"); \
+    mkdir -p "$DATA_DIR"; \
+    curl -fSL --retry 5 --retry-delay 5 --max-time 300 \
+      -o /tmp/fpgen-model.zip \
+      "https://github.com/scrapfly/fingerprint-generator/releases/download/model-2/2026/model-release.zip"; \
+    python -c "import zipfile,sys; zipfile.ZipFile('/tmp/fpgen-model.zip').extractall(sys.argv[1])" "$DATA_DIR"; \
+    rm -f /tmp/fpgen-model.zip; \
+    python -c "from camoufox.fpgen_model import ensure_fpgen_model; ensure_fpgen_model()"
+
 # Camoufox tarayıcısı (stage 1'den — runtime'da tekrar indirmez)
 COPY --from=browser /tmp/browser/.cache /app/.cache
 
